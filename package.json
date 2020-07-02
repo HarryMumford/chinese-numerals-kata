@@ -1,0 +1,15 @@
+{
+  "name": "chinese-numeral-kata",
+  "version": "1.0.0",
+  "description": "",
+  "main": "chinese-numeral-kata.js",
+  "scripts": {
+    "test": "jasmine chinese-numeral-kata.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "jasmine": "^3.5.0"
+  },
+  "dependencies": {}
+}
