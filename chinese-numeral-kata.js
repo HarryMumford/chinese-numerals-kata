@@ -19,8 +19,10 @@ function toChineseNumeral(num) {
   }
 
   let output = ""
-  const absNumeral = numerals[Math.abs(num)]
-  let arrayOfMagnitudes = formArrayOfMagnitudes(num)
+  const absNum = Math.abs(num)
+  const absNumeral = numerals[absNum]
+  const numString = num.toString()
+  const arrayOfMagnitudes = formArrayOfMagnitudes(num)
 
   //negative?
   if (num < 0) {
@@ -29,14 +31,32 @@ function toChineseNumeral(num) {
 
   //standard defined numeral
   if (absNumeral != undefined) {
-    output += absNumeral
+    return (output += absNumeral)
   }
 
   //10 - 19?
-  if (absNumeral == undefined) {
-    arrayOfMagnitudes.forEach(i => {
-      output += numerals[i]
-    })
+  if (absNum > 10 && absNum < 20) {
+    for (let i = 0; i < arrayOfMagnitudes.length; i++) {
+      const currentDigit = numString[i]
+      const currentMagnitude = arrayOfMagnitudes[i]
+      const currentNumeral = numerals[currentMagnitude * currentDigit]
+      output += currentNumeral
+    }
+  }
+
+  //Multi digit numbers
+  if (absNum > 19) {
+    for (let i = 0; i < arrayOfMagnitudes.length; i++) {
+      const currentDigit = numString[i]
+      const currentMagnitude = arrayOfMagnitudes[i]
+      if (currentMagnitude != 1) {
+        const currentNumeral =
+          numerals[currentDigit] + numerals[currentMagnitude]
+        output += currentNumeral
+      } else {
+        output += numerals[currentDigit]
+      }
+    }
   }
 
   return output
@@ -44,12 +64,11 @@ function toChineseNumeral(num) {
 
 function formArrayOfMagnitudes(num) {
   let arr = []
-  let sNumber = num.toString()
+  let numLength = num.toString().length
 
-  for (let i = 0, len = sNumber.length; i < len; i++) {
-    const currentDigit = sNumber.charAt(i)
-    const currentMagnitude = 10 ** (len - 1 - i)
-    arr.push(currentDigit * currentMagnitude)
+  for (let i = 0; i < numLength; i++) {
+    const currentMagnitude = 10 ** (numLength - 1 - i)
+    arr.push(currentMagnitude)
   }
 
   return arr
@@ -61,7 +80,7 @@ describe("Chinese Numerals:", function() {
   it("Single integers", function() {
     expect(toChineseNumeral(9)).toEqual("九")
     expect(toChineseNumeral(1)).toEqual("一")
-    // expect(toChineseNumeral(21)).toEqual("二十一")
+    expect(toChineseNumeral(21)).toEqual("二十一")
   })
   it("11 - 19", function() {
     expect(toChineseNumeral(11)).toEqual("十一")
