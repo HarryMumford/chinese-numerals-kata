@@ -19,29 +19,53 @@ function toChineseNumeral(num) {
   }
 
   let output = ""
+  const absNumeral = numerals[Math.abs(num)]
+  let arrayOfMagnitudes = formArrayOfMagnitudes(num)
 
   //negative?
   if (num < 0) {
     output += "负"
   }
 
-  const absNumeral = numerals[Math.abs(num)]
-
-  if (absNumeral == undefined) {
+  //standard defined numeral
+  if (absNumeral != undefined) {
+    output += absNumeral
   }
 
-  return (output += absNumeral)
+  //10 - 19?
+  if (absNumeral == undefined) {
+    arrayOfMagnitudes.forEach(i => {
+      output += numerals[i]
+    })
+  }
+
+  return output
+}
+
+function formArrayOfMagnitudes(num) {
+  let arr = []
+  let sNumber = num.toString()
+
+  for (let i = 0, len = sNumber.length; i < len; i++) {
+    const currentDigit = sNumber.charAt(i)
+    const currentMagnitude = 10 ** (len - 1 - i)
+    arr.push(currentDigit * currentMagnitude)
+  }
+
+  return arr
 }
 
 // inputs => outputs
 
-describe("Chinese Numerals", function() {
+describe("Chinese Numerals:", function() {
   it("Single integers", function() {
     expect(toChineseNumeral(9)).toEqual("九")
     expect(toChineseNumeral(1)).toEqual("一")
+    // expect(toChineseNumeral(21)).toEqual("二十一")
   })
   it("11 - 19", function() {
     expect(toChineseNumeral(11)).toEqual("十一")
+    expect(toChineseNumeral(15)).toEqual("十五")
   })
   it("Negative numbers", function() {
     expect(toChineseNumeral(-5)).toEqual("负五")
