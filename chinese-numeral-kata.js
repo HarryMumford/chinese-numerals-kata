@@ -24,38 +24,48 @@ function toChineseNumeral(num) {
   const numString = num.toString()
   const arrayOfMagnitudes = formArrayOfMagnitudes(num)
 
-  //negative?
+  // Negative?
   if (num < 0) {
-    output += "负"
+    output += numerals["-"]
   }
 
-  //standard defined numeral
+  // Standard defined numeral
   if (absNumeral != undefined) {
     return (output += absNumeral)
   }
 
-  //10 - 19?
+  // 10 - 19?
   if (absNum > 10 && absNum < 20) {
     for (let i = 0; i < arrayOfMagnitudes.length; i++) {
       const currentDigit = numString[i]
       const currentMagnitude = arrayOfMagnitudes[i]
       const currentNumeral = numerals[currentMagnitude * currentDigit]
+
       output += currentNumeral
     }
   }
 
-  //Multi digit numbers
+  // Multi digit numbers
   if (absNum > 19) {
-    for (let i = 0; i < arrayOfMagnitudes.length; i++) {
-      const currentDigit = numString[i]
+    for (let i = 0; i < arrayOfMagnitudes.length - 1; i++) {
+      const currentDigit = Number(numString[i])
       const currentMagnitude = arrayOfMagnitudes[i]
-      if (currentMagnitude != 1) {
-        const currentNumeral =
-          numerals[currentDigit] + numerals[currentMagnitude]
-        output += currentNumeral
+      const currentNumeral = numerals[currentDigit] + numerals[currentMagnitude]
+      console.log(i)
+
+      if (currentDigit === 0) {
+        console.log(currentDigit)
+        output += numerals[0]
       } else {
-        output += numerals[currentDigit]
+        output += currentNumeral
       }
+    }
+
+    const lastDigit = numString[numString.length - 1]
+    const lastNumeral = numerals[lastDigit]
+
+    if (lastDigit !== 0) {
+      output += lastNumeral
     }
   }
 
@@ -76,20 +86,30 @@ function formArrayOfMagnitudes(num) {
 
 // inputs => outputs
 
-describe("Chinese Numerals:", function() {
-  it("Single integers", function() {
-    expect(toChineseNumeral(9)).toEqual("九")
-    expect(toChineseNumeral(1)).toEqual("一")
-    expect(toChineseNumeral(21)).toEqual("二十一")
+describe("chinese-numerals", function() {
+  describe("/ integers", function() {
+    it("/ defined", function() {
+      expect(toChineseNumeral(9)).toEqual("九")
+      expect(toChineseNumeral(1)).toEqual("一")
+    })
+    it("/ multi-digit", function() {
+      expect(toChineseNumeral(21)).toEqual("二十一")
+      expect(toChineseNumeral(956)).toEqual("九百五十六")
+    })
+    fit("/ trailing-zero", function() {
+      // expect(toChineseNumeral(110)).toEqual("一百一十")
+      // expect(toChineseNumeral(20)).toEqual("二十")
+      expect(toChineseNumeral(2000)).toEqual("二千")
+    })
+    it("/ 11-19", function() {
+      expect(toChineseNumeral(11)).toEqual("十一")
+      expect(toChineseNumeral(15)).toEqual("十五")
+    })
+    it("/ negative", function() {
+      expect(toChineseNumeral(-5)).toEqual("负五")
+    })
   })
-  it("11 - 19", function() {
-    expect(toChineseNumeral(11)).toEqual("十一")
-    expect(toChineseNumeral(15)).toEqual("十五")
-  })
-  it("Negative numbers", function() {
-    expect(toChineseNumeral(-5)).toEqual("负五")
-  })
-  // it("Fractional numbers", function() {
+  // it("/ fractional-numbers", function() {
   //   expect(toChineseNumeral(0.5)).toEqual("零点五")
   // })
   // it("Special Cases", function() {
