@@ -29,8 +29,8 @@ function toChineseNumeral(num) {
     output += numerals["-"]
   }
 
-  // Standard defined numeral
-  if (absNumeral != undefined) {
+  // 0 - 10?
+  if (num < 11) {
     return (output += absNumeral)
   }
 
@@ -51,22 +51,26 @@ function toChineseNumeral(num) {
       const currentDigit = Number(numString[i])
       const currentMagnitude = arrayOfMagnitudes[i]
       const currentNumeral = numerals[currentDigit] + numerals[currentMagnitude]
-      console.log(i)
 
       if (currentDigit === 0) {
-        console.log(currentDigit)
         output += numerals[0]
       } else {
         output += currentNumeral
       }
     }
 
-    const lastDigit = numString[numString.length - 1]
+    const lastDigit = Number(numString[numString.length - 1])
     const lastNumeral = numerals[lastDigit]
 
     if (lastDigit !== 0) {
       output += lastNumeral
     }
+
+    // Shorten inner zeros
+    output = output.replace(/零+/g, "零")
+
+    // Remove trailing zeros
+    output = output.replace(/零+$/g, "")
   }
 
   return output
@@ -96,10 +100,13 @@ describe("chinese-numerals", function() {
       expect(toChineseNumeral(21)).toEqual("二十一")
       expect(toChineseNumeral(956)).toEqual("九百五十六")
     })
-    fit("/ trailing-zero", function() {
-      // expect(toChineseNumeral(110)).toEqual("一百一十")
-      // expect(toChineseNumeral(20)).toEqual("二十")
+    it("/ trailing-zero", function() {
+      expect(toChineseNumeral(110)).toEqual("一百一十")
+      expect(toChineseNumeral(20)).toEqual("二十")
       expect(toChineseNumeral(2000)).toEqual("二千")
+    })
+    it("/ inner-zeros", function() {
+      expect(toChineseNumeral(2002)).toEqual("二千零二")
     })
     it("/ 11-19", function() {
       expect(toChineseNumeral(11)).toEqual("十一")
@@ -112,13 +119,13 @@ describe("chinese-numerals", function() {
   // it("/ fractional-numbers", function() {
   //   expect(toChineseNumeral(0.5)).toEqual("零点五")
   // })
-  // it("Special Cases", function() {
-  //   expect(toChineseNumeral(10)).toEqual("十")
-  //   expect(toChineseNumeral(110)).toEqual("一百一十")
-  //   expect(toChineseNumeral(111)).toEqual("一百一十一")
-  //   expect(toChineseNumeral(1000)).toEqual("一千")
-  //   expect(toChineseNumeral(10000)).toEqual("一万")
-  //   expect(toChineseNumeral(10006)).toEqual("一万零六")
-  //   expect(toChineseNumeral(10306.005)).toEqual("一万零三百零六点零零五")
-  // })
+  it("/ special-cases", function() {
+    expect(toChineseNumeral(10)).toEqual("十")
+    expect(toChineseNumeral(110)).toEqual("一百一十")
+    expect(toChineseNumeral(111)).toEqual("一百一十一")
+    expect(toChineseNumeral(1000)).toEqual("一千")
+    expect(toChineseNumeral(10000)).toEqual("一万")
+    expect(toChineseNumeral(10006)).toEqual("一万零六")
+    // expect(toChineseNumeral(10306.005)).toEqual("一万零三百零六点零零五")
+  })
 })
