@@ -19,25 +19,32 @@ function toChineseNumeral(num) {
   }
 
   let output = ""
-  const absNum = Math.abs(num)
-  const absNumeral = numerals[absNum]
   const numString = num.toString()
-  const arrayOfMagnitudes = formArrayOfMagnitudes(num)
+
+  const intString = numString.split(".")[0]
+  const int = Number(intString)
+
+  const decimalString = numString.split(".")[1]
+  const decimal = Number(decimalString)
+
+  const absNum = Math.abs(int)
+  const absNumeral = numerals[absNum]
+  const arrayOfMagnitudes = formArrayOfMagnitudes(int)
 
   // Negative?
-  if (num < 0) {
+  if (int < 0) {
     output += numerals["-"]
   }
 
   // 0 - 10?
-  if (num < 11) {
-    return (output += absNumeral)
+  if (int < 11 && decimal !== undefined) {
+    output += absNumeral
   }
 
   // 10 - 19?
   if (absNum > 10 && absNum < 20) {
     for (let i = 0; i < arrayOfMagnitudes.length; i++) {
-      const currentDigit = numString[i]
+      const currentDigit = intString[i]
       const currentMagnitude = arrayOfMagnitudes[i]
       const currentNumeral = numerals[currentMagnitude * currentDigit]
 
@@ -48,7 +55,7 @@ function toChineseNumeral(num) {
   // Multi digit numbers
   if (absNum > 19) {
     for (let i = 0; i < arrayOfMagnitudes.length - 1; i++) {
-      const currentDigit = Number(numString[i])
+      const currentDigit = Number(intString[i])
       const currentMagnitude = arrayOfMagnitudes[i]
       const currentNumeral = numerals[currentDigit] + numerals[currentMagnitude]
 
@@ -59,7 +66,7 @@ function toChineseNumeral(num) {
       }
     }
 
-    const lastDigit = Number(numString[numString.length - 1])
+    const lastDigit = Number(intString[intString.length - 1])
     const lastNumeral = numerals[lastDigit]
 
     if (lastDigit !== 0) {
@@ -71,6 +78,17 @@ function toChineseNumeral(num) {
 
     // Remove trailing zeros
     output = output.replace(/零+$/g, "")
+  }
+
+  // Add decimal
+  if (decimal) {
+    output += numerals["."]
+    for (let i = 0; i < decimalString.length; i++) {
+      const currentDigit = Number(decimalString[i])
+      const currentNumeral = numerals[currentDigit]
+
+      output += currentNumeral
+    }
   }
 
   return output
@@ -116,9 +134,9 @@ describe("chinese-numerals", function() {
       expect(toChineseNumeral(-5)).toEqual("负五")
     })
   })
-  // it("/ fractional-numbers", function() {
-  //   expect(toChineseNumeral(0.5)).toEqual("零点五")
-  // })
+  it("/ fractional-numbers", function() {
+    expect(toChineseNumeral(0.5)).toEqual("零点五")
+  })
   it("/ special-cases", function() {
     expect(toChineseNumeral(10)).toEqual("十")
     expect(toChineseNumeral(110)).toEqual("一百一十")
@@ -126,6 +144,6 @@ describe("chinese-numerals", function() {
     expect(toChineseNumeral(1000)).toEqual("一千")
     expect(toChineseNumeral(10000)).toEqual("一万")
     expect(toChineseNumeral(10006)).toEqual("一万零六")
-    // expect(toChineseNumeral(10306.005)).toEqual("一万零三百零六点零零五")
+    expect(toChineseNumeral(10306.005)).toEqual("一万零三百零六点零零五")
   })
 })
