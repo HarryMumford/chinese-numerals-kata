@@ -21,28 +21,26 @@ function toChineseNumeral(num) {
   let output = ""
   const numString = num.toString()
 
-  const intString = numString.split(".")[0]
-  const int = Number(intString)
+  const intString = Math.abs(numString.split(".")[0]).toString()
+  const int = Math.abs(Number(intString))
 
   const decimalString = numString.split(".")[1]
   const decimal = Number(decimalString)
 
-  const absNum = Math.abs(int)
-  const absNumeral = numerals[absNum]
   const arrayOfMagnitudes = formArrayOfMagnitudes(int)
 
   // Negative?
-  if (int < 0) {
+  if (num < 0) {
     output += numerals["-"]
   }
 
   // 0 - 10?
-  if (int < 11 && decimal !== undefined) {
-    output += absNumeral
+  if (int < 11) {
+    output += numerals[int]
   }
 
   // 10 - 19?
-  if (absNum > 10 && absNum < 20) {
+  if (int > 10 && int < 20) {
     for (let i = 0; i < arrayOfMagnitudes.length; i++) {
       const currentDigit = intString[i]
       const currentMagnitude = arrayOfMagnitudes[i]
@@ -53,7 +51,7 @@ function toChineseNumeral(num) {
   }
 
   // Multi digit numbers
-  if (absNum > 19) {
+  if (int > 19) {
     for (let i = 0; i < arrayOfMagnitudes.length - 1; i++) {
       const currentDigit = Number(intString[i])
       const currentMagnitude = arrayOfMagnitudes[i]
@@ -106,8 +104,6 @@ function formArrayOfMagnitudes(num) {
   return arr
 }
 
-// inputs => outputs
-
 describe("chinese-numerals", function() {
   describe("/ integers", function() {
     it("/ defined", function() {
@@ -132,6 +128,7 @@ describe("chinese-numerals", function() {
     })
     it("/ negative", function() {
       expect(toChineseNumeral(-5)).toEqual("负五")
+      expect(toChineseNumeral(-21)).toEqual("负二十一")
     })
   })
   it("/ fractional-numbers", function() {
